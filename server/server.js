@@ -12,6 +12,7 @@ const app = express()
 await connectDB();
 
 //Middlewares
+//Dummy comments
 app.use(cors())
 
 //Routes
