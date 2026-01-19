@@ -1,9 +1,11 @@
 import { Webhook } from "svix";
 import User from "../models/User.js";
-import { connectDB } from "../config/db.js";
+import connectDB from "../configs/mongodb.js";
 
 export const clerkWebhooks = async (req, res) => {
   try {
+    console.log("🚀 Clerk webhook hit");
+
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     // ✅ Verify webhook using RAW body
