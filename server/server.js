@@ -17,7 +17,15 @@ app.use(cors())
 
 //Routes
 app.get('/', (req,res)=> res.send("Started") )
-app.post('/clerk', express.json(), clerkWebhooks)
+
+app.post(
+  "/clerk",
+  express.raw({ type: "application/json" }),
+  clerkWebhooks
+);
+
+// AFTER webhook
+app.use(express.json());
 
 //Port
 const PORT = process.env.PORT || 5000
