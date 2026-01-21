@@ -17,10 +17,6 @@ const userSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
     },
-    role: {
-      type: String,
-      default: "student",
-    },
   },
   {
     timestamps: true,
