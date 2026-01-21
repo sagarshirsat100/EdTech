@@ -1,21 +1,34 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { Line } from "rc-progress";
+import axios from "axios";
+import { data } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const MyEnrollments = () => {
-  const { enrolledCourses, calculateCourseDuration, navigate } =
+  const { enrolledCourses, calculateCourseDuration, navigate, userData, fetchUserEnrolledCourses, backendUrl, getToken, calculateNoOfLecture } =
     useContext(AppContext);
 
-  // Temporary mock progress (later replace with backend data)
-  const [progressArray] = useState([
-    { lecturesCompleted: 4, totalLectures: 10 },
-    { lecturesCompleted: 7, totalLectures: 15 },
-    { lecturesCompleted: 2, totalLectures: 8 },
-    { lecturesCompleted: 4, totalLectures: 10 },
-    { lecturesCompleted: 7, totalLectures: 15 },
-    { lecturesCompleted: 2, totalLectures: 8 },
-  ]);
+  const [progressArray, setProgressArray] = useState([]);
 
+  const getCourseProgress = async () => {
+    try {
+      const token = await getToken()
+      const tempProgressArray = await Promise.all(
+        enrolledCourses.map(async (course)=> {
+          const {data} = await axios.post(`${backendUrl}/api/user/get-course-progress`, {courseId: course._id}, {headers: {Authorization: `Bearer ${token}`}})
+          let totalLectures = calculateNoOfLecture(course)
+      const lecturesCompleted = data.progressData? data.progressData.lecturesCompleted.length : 0;
+      return {totalLectures, lecturesCompleted}
+        })
+      )
+      setProgressArray(tempProgressArray)
+      
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  
   if (!enrolledCourses || enrolledCourses.length === 0) {
     return (
       <div className="md:px-36 px-8 pt-10">
@@ -24,6 +37,18 @@ const MyEnrollments = () => {
       </div>
     );
   }
+
+  useEffect(()=> {
+    if(userData) {
+      fetchUserEnrolledCourses()
+    }
+  }, [userData])
+
+  useEffect(()=> {
+    if(enrolledCourses.length > 0) {
+      getCourseProgress()
+    }
+  }, [enrolledCourses])
 
   return (
     <div className="md:px-36 px-8 pt-10">

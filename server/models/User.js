@@ -17,7 +17,13 @@ const userSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
     },
-  },
+    enrolledCourses: [
+      {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Course'
+      }
+    ],
+    },
   {
     timestamps: true,
     strict: true, // default, but explicit for clarity

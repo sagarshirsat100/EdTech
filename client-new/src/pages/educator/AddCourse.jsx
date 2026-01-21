@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import uniqid from "uniqid";
 import Quill from "quill";
 import { assets } from "../../assets/assets";
+import {AppContext} from "../../context/AppContext.jsx"
+import axios from "axios";
 
 const AddCourse = () => {
+  const {backendUrl, getToken} = useContext(AppContext)
   const editorRef = useRef(null);
   const quillInstanceRef = useRef(null);
 
@@ -60,7 +63,37 @@ const AddCourse = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+      if(!image) {
+        toast.error('Thumbnail not selected')
+      }
+      const courseData = {
+        courseTitle,
+        courseDescription: quillRef.current.root.innerHTML, coursePrice: Number(coursePrice), discount: Number(discount),
+        courseContent: chapter,
+      }
+      const formData = new FormData()
+      formData.append('courseData', JSON.stringify(courseData))
+      formData.append('image', image)
+
+      const token = await getToken()
+      const {data} = await axios.post(backendUrl + '/api/educator/add-course', formData, {headers: {Authorization: `Bearer ${token}`}})
+
+      if(data.success) {
+        toast.success(data.message)
+        setCourseTitle("")
+        setCoursePrice(0)
+        setDiscount(null)
+        setImage(null)
+        setChapters([])
+        quillRef.current.root.innerHTML = ""
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
   };
 
   const handleChapter = (action, chapterId) => {
