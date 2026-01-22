@@ -71,7 +71,7 @@ export const purchaseCourse = async (req, res) => {
     const currency = process.env.CURRENCY.toLowerCase();
 
     const session = await stripe.checkout.sessions.create({
-      success_url: `${origin}/enrolled-courses`,
+      success_url: `${origin}/my-enrollments`,
       cancel_url: `${origin}/`,
       mode: "payment",
       line_items: [
