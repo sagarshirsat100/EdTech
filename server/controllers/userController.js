@@ -21,6 +21,7 @@ export const getUserData = async (req, res) => {
 
 
 
+
 export const userEnrolledCourses = async (req, res) => {
   try {
     const clerkUserId = req.auth.userId;

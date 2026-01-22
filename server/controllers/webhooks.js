@@ -1,12 +1,18 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { Webhook } from "svix";
 import User from "../models/User.js";
 import Purchase from "../models/Purchase.js";
 import connectDB from "../configs/mongodb.js";
 import Stripe from 'stripe'
 
+
+
 export const clerkWebhooks = async (req, res) => {
   try {
-    console.log("STEP 1: Webhook handler entered");
+    console.log("🔥 CLERK WEBHOOK HIT");
+
 
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 

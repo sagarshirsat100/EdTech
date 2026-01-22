@@ -1,7 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import dotenv from "dotenv";
 
-dotenv.config();
 
 const connectCloudinary = () => {
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_SECRET_KEY } = process.env;

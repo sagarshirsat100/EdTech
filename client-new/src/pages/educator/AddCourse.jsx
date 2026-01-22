@@ -4,6 +4,7 @@ import Quill from "quill";
 import { assets } from "../../assets/assets";
 import {AppContext} from "../../context/AppContext.jsx"
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const AddCourse = () => {
   const {backendUrl, getToken} = useContext(AppContext)
@@ -34,33 +35,37 @@ const AddCourse = () => {
   }, []);
 
   const addLecture = () => {
-    setChapters(
-      chapters.map((chapter) => {
-        if (chapter.chapterId === currentChapterId) {
-          const newLecture = {
-            ...lectureDetails,
-            lectureOrder:
-              chapter.chapterContent.length > 0
-                ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1
-                : 1,
-            lectureId: uniqid(),
-          };
-          return {
-            ...chapter,
-            chapterContent: [...chapter.chapterContent, newLecture],
-          };
-        }
-        return chapter;
-      })
-    );
-    setShowPopup(false);
-    setLectureDetails({
-      lectureTitle: "",
-      lectureDuration: "",
-      lectureUrl: "",
-      isPreviewFree: false,
-    });
-  };
+  setChapters((prevChapters) =>
+    prevChapters.map((chapter) => {
+      if (chapter.chapterId === currentChapterId) {
+        const newLecture = {
+          ...lectureDetails,
+          lectureId: uniqid(),
+          lectureOrder:
+            chapter.chapterContent.length > 0
+              ? chapter.chapterContent[chapter.chapterContent.length - 1]
+                  .lectureOrder + 1
+              : 1,
+        };
+
+        return {
+          ...chapter,
+          chapterContent: [...chapter.chapterContent, newLecture],
+        };
+      }
+      return chapter;
+    })
+  );
+
+  setShowPopup(false);
+  setLectureDetails({
+    lectureTitle: "",
+    lectureDuration: "",
+    lectureUrl: "",
+    isPreviewFree: false,
+  });
+};
+
 
   const handleSubmit = async (e) => {
     try {
@@ -70,8 +75,8 @@ const AddCourse = () => {
       }
       const courseData = {
         courseTitle,
-        courseDescription: quillRef.current.root.innerHTML, coursePrice: Number(coursePrice), discount: Number(discount),
-        courseContent: chapter,
+        courseDescription: quillInstanceRef.current.root.innerHTML, coursePrice: Number(coursePrice), discount: Number(discount),
+        courseContent: chapters,
       }
       const formData = new FormData()
       formData.append('courseData', JSON.stringify(courseData))
@@ -87,7 +92,7 @@ const AddCourse = () => {
         setDiscount(null)
         setImage(null)
         setChapters([])
-        quillRef.current.root.innerHTML = ""
+        quillInstanceRef.current.root.innerHTML = ""
       } else {
         toast.error(data.message)
       }

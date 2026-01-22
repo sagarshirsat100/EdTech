@@ -2,16 +2,16 @@ import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
 import { assets, dummyDashboardData } from "../../assets/assets";
 import axios from "axios";
-
+import Loading from '../../components/Loading.jsx'
+ 
 const Dashboard = () => {
   const { currency, backendUrl, isEducator, getToken } = useContext(AppContext);
   const [dashboardData, setDashboardData] = useState(null);
 
-  const fetchDashboardData = async () => {
+ const fetchDashboardData = async () => {
     try {
       const token = await getToken();
       const {data} = await axios.get(backendUrl + '/api/educator/dashboard', {headers:{Authorization:`Bearer ${token}`}})
-
       if(data.success) {
         setDashboardData(data)
       }
@@ -27,13 +27,9 @@ const Dashboard = () => {
     if(isEducator) {
       fetchDashboardData()
     }
-  }, []);
+  }, [isEducator]);
 
-  if (!dashboardData) {
-    return <p className="p-8 text-gray-500">Loading dashboard...</p>;
-  }
-
-  return (
+  return dashboardData ? (
     <div className="min-h-screen flex flex-col justify-between gap-8 md:p-8 p-4 pt-8">
 
       {/* TOP STATS */}
@@ -45,7 +41,7 @@ const Dashboard = () => {
             <img src={assets.patients_icon} alt="students" />
             <div>
               <p className="text-2xl font-medium text-gray-600">
-                {dashboardData.enrolledStudentsData.length}
+                {dashboardData.enrolledStudentsData?.length}
               </p>
               <p className="text-base text-gray-500">Total Enrollments</p>
             </div>
@@ -93,7 +89,7 @@ const Dashboard = () => {
               </thead>
 
               <tbody className="text-sm text-gray-500">
-                {dashboardData.enrolledStudentsData.map((item, index) => (
+                {dashboardData.enrolledStudentsData?.map((item, index) => (
                   <tr key={index} className="border-b border-gray-500/20">
                     <td className="px-4 py-3 text-center hidden sm:table-cell">
                       {index + 1}
@@ -122,7 +118,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  );
+  ) : <Loading/>
 };
 
 export default Dashboard;
