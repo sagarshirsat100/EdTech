@@ -6,6 +6,7 @@ import User from "../models/User.js";
 import Purchase from "../models/Purchase.js";
 import connectDB from "../configs/mongodb.js";
 import Stripe from 'stripe'
+import Course from "../models/Course.js";
 
 
 
