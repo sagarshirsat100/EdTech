@@ -2,13 +2,14 @@ import User from "../models/User.js"
 import Course from "../models/Course.js";
 import Purchase from '../models/Purchase.js'
 import Stripe from "stripe"
+import CourseProgress from "../models/CourseProgress.js";
 
 export const getUserData = async (req, res) => {
   try {
     const clerkUserId = req.auth.userId;
 
     const user = await User.findOne({ clerkId: clerkUserId });
-
+    
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
@@ -18,9 +19,6 @@ export const getUserData = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
-
-
 
 export const userEnrolledCourses = async (req, res) => {
   try {
@@ -157,7 +155,6 @@ export const addUserRating = async (req, res) => {
     if (!courseId || !clerkUserId || rating < 1 || rating > 5) {
       return res.json({ success: false, message: "Invalid Details" });
     }
-
     const course = await Course.findById(courseId);
     if (!course) {
       return res.json({ success: false, message: "Course not found." });

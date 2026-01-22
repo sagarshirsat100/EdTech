@@ -7,49 +7,68 @@ import { toast } from "react-toastify";
 import Footer from "../educator/Footer";
 
 const MyEnrollments = () => {
-  const { enrolledCourses, calculateCourseDuration, navigate, userData, fetchUserEnrolledCourses, backendUrl, getToken, calculateNoOfLecture } =
-    useContext(AppContext);
+  const {
+  enrolledCourses,
+  calculateCourseDuration,
+  navigate,
+  userData,
+  fetchEnrolledCourses,
+  backendUrl,
+  getToken,
+  calculateNoOfLectures,
+} = useContext(AppContext);
 
-  const [progressArray, setProgressArray] = useState([]);
+const [progressArray, setProgressArray] = useState([]);
 
+// ✅ hooks FIRST — always
+useEffect(() => {
+  if (userData) {
+    fetchEnrolledCourses();
+  }
+}, [userData]);
+
+useEffect(() => {
   const getCourseProgress = async () => {
     try {
-      const token = await getToken()
+      const token = await getToken();
+
       const tempProgressArray = await Promise.all(
-        enrolledCourses.map(async (course)=> {
-          const {data} = await axios.post(`${backendUrl}/api/user/get-course-progress`, {courseId: course._id}, {headers: {Authorization: `Bearer ${token}`}})
-          let totalLectures = calculateNoOfLecture(course)
-      const lecturesCompleted = data.progressData? data.progressData.lecturesCompleted.length : 0;
-      return {totalLectures, lecturesCompleted}
+        enrolledCourses.map(async (course) => {
+          const { data } = await axios.post(
+            `${backendUrl}/api/user/get-course-progress`,
+            { courseId: course._id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          const totalLectures = calculateNoOfLectures(course);
+          const lecturesCompleted = data.progressData
+            ? data.progressData.lecturesCompleted.length
+            : 0;
+
+          return { totalLectures, lecturesCompleted };
         })
-      )
-      setProgressArray(tempProgressArray)
-      
+      );
+
+      setProgressArray(tempProgressArray);
     } catch (error) {
       toast.error(error.message);
     }
-  }
-  
-  if (!enrolledCourses || enrolledCourses.length === 0) {
-    return (
-      <div className="md:px-36 px-8 pt-10">
-        <h1 className="text-2xl font-semibold">My Enrollments</h1>
-        <p className="mt-6 text-gray-500">No enrolled courses yet.</p>
-      </div>
-    );
-  }
+  };
 
-  useEffect(()=> {
-    if(userData) {
-      fetchUserEnrolledCourses()
-    }
-  }, [userData])
+  if (enrolledCourses && enrolledCourses.length > 0) {
+    getCourseProgress();
+  }
+}, [enrolledCourses]);
 
-  useEffect(()=> {
-    if(enrolledCourses.length > 0) {
-      getCourseProgress()
-    }
-  }, [enrolledCourses])
+// ✅ conditional rendering AFTER hooks
+if (!enrolledCourses || enrolledCourses.length === 0) {
+  return (
+    <div className="md:px-36 px-8 pt-10">
+      <h1 className="text-2xl font-semibold">My Enrollments</h1>
+      <p className="mt-6 text-gray-500">No enrolled courses yet.</p>
+    </div>
+  );
+}
 
   return (
     <div className="md:px-36 px-8 pt-10">

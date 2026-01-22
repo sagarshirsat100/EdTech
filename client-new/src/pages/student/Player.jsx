@@ -9,6 +9,7 @@ import Youtube from "react-youtube";
 import Rating from "../../components/student/Rating";
 import { toast } from "react-toastify";
 import Loading from '../../components/Loading.jsx'
+import axios from "axios";
 
 const Player = () => {
 
@@ -25,8 +26,8 @@ const Player = () => {
     enrolledCourses.map((course) => {
       if (course._id === courseId) {
         setCourseData(course);
-        course.courseRatings.map(() => {
-          if (item.userId === userData._id)
+        course.courseRatings.map((item) => {
+          if (item.userId === userData?._id)
             setInitialRating(item.rating)
         })
       }
@@ -65,7 +66,7 @@ const Player = () => {
   const getCourseProgress = async () => {
     try {
       const token = await getToken()
-      const { data } = await axios.post(backendUrl + '/api/user/get-course-progress', { courseId }, { headers: { Authorization: `Bearer ${token}}` } })
+      const { data } = await axios.post(backendUrl + '/api/user/get-course-progress', { courseId }, { headers: { Authorization: `Bearer ${token}` } })
       if (data.success) {
         setProgressData(data.progressData)
       } else {
@@ -73,14 +74,13 @@ const Player = () => {
       }
     } catch (error) {
       toast.error(error.message)
-      I
     }
   }
 
-  const handleRate = async () => {
+  const handleRate = async (rating) => {
     try {
       const token = await getToken()
-      const {data} = await axios.post(backendUrl + '/api/user/add-rating', {courseId, rating},{ headers: { Authorization: `Bearer ${token}}` } })
+      const {data} = await axios.post(backendUrl + '/api/user/add-rating', {courseId, rating},{ headers: { Authorization: `Bearer ${token}` } })
       if (data.success) {
         toast.success(data.message)  
         fetchEnrolledCourses()
@@ -89,7 +89,6 @@ const Player = () => {
       }
     } catch (error) {
       toast.error(error.message)
-      I
     }
   }
 
@@ -104,7 +103,7 @@ const Player = () => {
         <div className='text-gray-800'>
           <h2 className='text-xl font-semibold'>Course Structure</h2>
           <div className="pt-5">
-            {courseData && courseData.courseContent.map((chapter, index) => (
+            {courseData && courseData.courseContent?.map((chapter, index) => (
               <div key={index} className="border border-gray-300 bg-white mb-2 rounded">
 
                 {/* Chapter header */}

@@ -3,25 +3,40 @@ import { AppContext } from "../../context/AppContext";
 import { assets, dummyDashboardData } from "../../assets/assets";
 import axios from "axios";
 import Loading from '../../components/Loading.jsx'
- 
+import { toast } from "react-toastify";
+
 const Dashboard = () => {
   const { currency, backendUrl, isEducator, getToken } = useContext(AppContext);
-  const [dashboardData, setDashboardData] = useState(null);
+const [dashboardData, setDashboardData] = useState(null);
 
- const fetchDashboardData = async () => {
-    try {
-      const token = await getToken();
-      const {data} = await axios.get(backendUrl + '/api/educator/dashboard', {headers:{Authorization:`Bearer ${token}`}})
-      if(data.success) {
-        setDashboardData(data)
+const fetchDashboardData = async () => {
+  try {
+    const token = await getToken();
+
+    const { data } = await axios.get(
+      `${backendUrl}/api/educator/dashboard`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-      else {
-        toast.error(data.message)
-      }
-    } catch (error) {
-      toast.error(error.message)
+    );
+    if (data.success) {
+      setDashboardData(data);
+    } else {
+      toast.error(data.message);
     }
+  } catch (error) {
+    toast.error(error.message);
   }
+};
+
+useEffect(() => {
+  if (isEducator) {
+    fetchDashboardData();
+  }
+}, [isEducator]);
+
 
   useEffect(() => {
     if(isEducator) {
