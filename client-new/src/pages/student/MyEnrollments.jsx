@@ -4,6 +4,7 @@ import { Line } from "rc-progress";
 import axios from "axios";
 import { data } from "react-router-dom";
 import { toast } from "react-toastify";
+import Footer from "../educator/Footer";
 
 const MyEnrollments = () => {
   const { enrolledCourses, calculateCourseDuration, navigate, userData, fetchUserEnrolledCourses, backendUrl, getToken, calculateNoOfLecture } =
